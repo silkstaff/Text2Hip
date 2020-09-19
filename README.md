@@ -1,5 +1,5 @@
 # Text2Hip
-* A project that transforming normal sentences to hiphop-like lyrics, 'Text to Hiphop'
+A project that transforming normal sentences to hiphop-like lyrics, 'Text to Hiphop'
 * People: Jihyeong Ko, Jinsoo Bae, Sanghee Kim, Hojin Hwang (who are 3th member of the big data Academic Club, BITAmin)
 
 ## Introduction Video
