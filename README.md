@@ -1,6 +1,8 @@
 # Text2Hip
-* A project that transforming normal sentences to hiphop-like lyrics, 'Text to Hiphop'
+* A project about an algorithm that transforms normal sentences to hiphop-like lyrics, 'Text to Hiphop'
 * People: Jihyeong Ko, Jinsoo Bae, Sanghee Kim, Hojin Hwang (who are 3th member of the big data Academic Club, BITAmin)
+* Main Points: LDA(extracts main context from texts), transformer(makes text hiphop-like), Rhyme Optimization(optimizes the output from transformer by using our own Rhyme Score)
+
 
 ## Introduction Video
 https://cafe.naver.com/bitamin123/1586
