@@ -9,7 +9,10 @@
 
 
 ## Introduction Video
-https://cafe.naver.com/bitamin123/1586
+- https://cafe.naver.com/bitamin123/1586
+- You can also see the presentation by downloading `Presentation.mp4`
+- You can find the contents in `Presentation.pptx`
+
 
 ## Contents
 ![image](https://user-images.githubusercontent.com/53327766/87830869-f9e28400-c8bc-11ea-892b-5d7e5f4bcc68.png)
