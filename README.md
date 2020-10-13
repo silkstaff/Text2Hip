@@ -9,11 +9,10 @@
 - 프로젝트 소개 영상: https://cafe.naver.com/bitamin123/1586
 - [발표 자료 다운로드](https://github.com/iloveslowfood/Text2Hip/raw/master/Presentation.pptx)
 - [발표 영상 다운로드](https://github.com/iloveslowfood/Text2Hip/raw/master/Presentation.mp4)
-
-- 메인 컨텐츠
-  - `LDA`: 텍스트로부터 핵심 문장 또는 키워드를 추출합니다.
-  - `Transformer`: LDA를 통해 추출한 핵심 내용을 힙합스럽게 변환합니다.
-  - `Rhyme Optimization`: 한국어 음운 규칙을 기반으로 개발한 라임 최적화 알고리즘을 통해 Transformer로부터 얻은 힙합 가사의 운율을 극대화합니다.
+- 주요 내용
+  `LDA`: 텍스트로부터 핵심 문장 또는 키워드를 추출합니다.
+  `Transformer`: LDA를 통해 추출한 핵심 내용을 힙합스럽게 변환합니다.
+  `Rhyme Optimization`: 한국어 음운 규칙을 기반으로 개발한 라임 최적화 알고리즘을 통해 Transformer로부터 얻은 힙합 가사의 운율을 극대화합니다.  
   
 ![image](https://user-images.githubusercontent.com/53327766/87830869-f9e28400-c8bc-11ea-892b-5d7e5f4bcc68.png)
 ![image](https://user-images.githubusercontent.com/53327766/87831333-2ba81a80-c8be-11ea-9faf-b28fd63081b9.png)
