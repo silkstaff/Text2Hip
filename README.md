@@ -7,7 +7,7 @@
 
 ## 🐱‍🚀프로젝트 결과
 - 프로젝트 소개 영상: https://cafe.naver.com/bitamin123/1586
-- [발표 자료 다운로드](https://github.com/iloveslowfood/Text2Hip/raw/master/Presentation.pptx)
+- 발표 자료는 [여기](https://github.com/iloveslowfood/Text2Hip/blob/master/Presentation.pdf)에서 보실 수 있습니다.
 - [발표 영상 다운로드](https://github.com/iloveslowfood/Text2Hip/raw/master/Presentation.mp4)
 - 주요 내용  
   `LDA`: 텍스트로부터 핵심 키워드를 추출합니다.  
