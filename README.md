@@ -19,7 +19,7 @@
 ![](https://user-images.githubusercontent.com/48649606/95861125-fa939500-0d9b-11eb-9af4-f924328e1cdf.png)
 
 ## 👩‍👧‍👧프로젝트 참여 인원
-* 고지형, 김상희, 배진수, 황호진
+* [고지형](https://github.com/iloveslowfood), 김상희, 배진수, 황호진
 
 ## 👀실치 및 학습
 * Clone repository  
