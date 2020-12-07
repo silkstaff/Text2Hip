@@ -4,53 +4,63 @@ Created on Fri Jul 10 15:05:46 2020
 
 @author: 고지형, 배진수
 """
-#%% library 
-import pandas as pd 
-from jamo import j2hcj, h2j 
-import numpy as np
-from numpy import dot
-from numpy.linalg import norm
 import pickle 
 import argparse
 import re
 
-#%% function 
+import pandas as pd 
+import numpy as np
+from numpy import dot
+from numpy.linalg import norm
 
-def sigma(n):
-    output = 0
-    for i in range(1, n+1):
-        output+=i
-    return output
+from jamo import j2hcj, h2j 
+
 
 def score(str1, str2):
-    if (len(str1)>1) and (len(str2) >1):
-        n_windows = max([len(str1)-1, len(str2)-1])
+    '''두 문자열 간 운율 점수를 구하는 함수
+    * 두 문자열이 보유한 글자 수를 고려하여, 윈도우를 움직이면서 각 위치에 대한 운율 점수를 구한다.
+    * 단어의 뒷부분일 수록 운율이 중요하므로, 문자열의 뒷부분에서 구한 운율 점수일 수록 높은 가중치를 부여
+    * 최종 운율 점수는 윈도윙을 통해 구한 모든 운율 점수의 가중 평균
+    '''
+    if (len(str1) > 1) and (len(str2) > 1): # 두 문자열 모두 2글자 이상
+        n_windows = max([len(str1)-1, len(str2)-1]) # 사이즈 설정
         score_list, output = [], 0
-        for step in range(n_windows):
+        
+        for step in range(n_windows): # 뒷자리부터 운율 점수 측정
             if step == 0:
-                score_list.append((score_each(str1[-2: ], str2[-2:])))
+                score_list.append((score_each(str1[-2:], str2[-2:])))
             else:
                 if (str1[-2-step:-step] == '') or (str2[-2-step:-step]==''):
                     break
                 score_list.append(score_each(str1[-2-step: -step], str2[-2-step: -step]))
+                
         weights = sorted([i for i in range(1, len(score_list)+1)], reverse=True)
         return (np.array(score_list) * np.array(weights)).sum() / sigma(len(score_list))
-    else:
+    
+    else: # 어느 하나라도 1글자인 경우: 맨 뒷글자 간 비교만 진행
         return score_each(str1, str2)
 
-
-
-
-
-
+    
+def sigma(n:int):
+    '''1부터 n까지의 합을 구하는 함수'''
+    output = 0
+    for i in range(1, n+1):
+        output+=i
+    return output
+    
+    
 def score_each(str1, str2):
-    str1, str2 = sori(str1), sori(str2)
-    # 한글자 짜리
+    '''
+    
+    '''
+    str1, str2 = sori(str1), sori(str2) # 소리나는 대로 읽기
     first_score, last_score = 0, 0
-    if len(str1)==1 or len(str2)==1:
+    
+    if len(str1)==1 or len(str2)==1: # 두 글자 모두 1글자인 경우
         temp1, temp2 = str1[-1], str2[-1]
         last_score = score_element(temp1, temp2)
         return last_score
+    
     else:
         temp1, temp2, moum = str1[-1], str2[-1], [] # 마지막 글자
         last_score = score_element(temp1, temp2)
@@ -62,13 +72,19 @@ def score_each(str1, str2):
     return first_score*0.25 + last_score*0.75
 
 
-# 1등급 모음 그룹: ['ㅏ', 'ㅘ', 'ㅑ'], ['ㅓ', 'ㅕ', 'ㅝ'], ['ㅐ', 'ㅒ', 'ㅔ', 'ㅖ', 'ㅙ', 'ㅚ', 'ㅞ'], ['ㅗ', 'ㅛ'], ['ㅜ', 'ㅠ', 'ㅡ'], ['ㅟ', 'ㅢ', 'ㅣ']  
-# 2등급 모음 그룹: ['ㅏ', 'ㅐ', 'ㅑ,' 'ㅒ,' 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ'], ['ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ']
-# - 2등급 모음: 음성 모음과 양성 모음으로 구별한다.
-
-
-
 def score_element(x1, x2):
+    '''1글자의 문자 간 운율 점수를 측정하는 함수
+    일정 규에 따라 두 문자 간 운율이 얼마나 유사한지 측정
+    * 모음: 
+        * 서로 일치하는 것이 Best, 불일치시 유사 모음인지 확인하여 점수 부여. 유사 모음은 다음의 그룹들을 따른다.
+            * 1등급 모음 그룹: ['ㅏ', 'ㅘ', 'ㅑ'], ['ㅓ', 'ㅕ', 'ㅝ'], ['ㅐ', 'ㅒ', 'ㅔ', 'ㅖ', 'ㅙ', 'ㅚ', 'ㅞ'], ['ㅗ', 'ㅛ'], ['ㅜ', 'ㅠ', 'ㅡ'], ['ㅟ', 'ㅢ', 'ㅣ']  
+                * 1등급 모음 그룹핑 기준: 발음 후 마지막 입모양이 같은 모음끼리 묶음
+            * 2등급 모음 그룹: ['ㅏ', 'ㅐ', 'ㅑ,' 'ㅒ,' 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ'], ['ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ']
+                * 2등급 모음 그룹핑 기준: 음성 모음/양성 모음
+    * 자음:
+        * 종성에 대한 비교
+        * 두 종성 자음이 울림소리로 같을 경우 또는 안올림소리로 같을 경우 등 속성이 같을 때 높은 점수 부여
+    '''
     ullim_sori = ['ㄴ', 'ㄹ', 'ㅇ', 'ㅁ']
     moum_similar_A = pd.Series([['ㅏ', 'ㅘ', 'ㅑ'], ['ㅓ', 'ㅕ', 'ㅝ'], ['ㅐ', 'ㅒ', 'ㅔ', 'ㅖ', 'ㅙ', 'ㅚ', 'ㅞ'], ['ㅗ', 'ㅛ'], ['ㅜ', 'ㅠ', 'ㅡ'], ['ㅟ', 'ㅢ', 'ㅣ']])
     moum_similar_B = pd.Series([['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ'], ['ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ']])
@@ -80,27 +96,29 @@ def score_element(x1, x2):
         else:
             moum.append(x[-1])
             
-    if moum[0] == moum[1]: # 모음이 완전 같으면 5점
+    if moum[0] == moum[1]: # 모음 일치할 경우 +5점
         score += 5
-        if len(x1)==len(x2): # 둘다 초중종성 구성이거나 초중성 구성일 때
-            score += 3 # 일단 3점 줌
-            if (len(x1)==3 and x1[-1] in ullim_sori and x2[-1] not in ullim_sori) or (len(x1)==3 and x1[-1] not in ullim_sori and x2[-1] in ullim_sori): 
-                score -= 1 # 둘다 초중종성일 때, 받침 속성이 다르면 1점 감점
-        else: # 서로 문자 구성이 다른 경우
+        if len(x1)==len(x2): # 문자 구성이 같은 경우(둘다 초중종성의 구성, 둘다 초중성) +3점
+            score += 3
+            if (len(x1)==3 and x1[-1] in ullim_sori and x2[-1] not in ullim_sori) or \ # x1의 종성이 울림소리 vs x2의 종성 안울림소리
+               (len(x1)==3 and x1[-1] not in ullim_sori and x2[-1] in ullim_sori):  # x1의 종성이 안울림소리 vs x2의 종성이 울림소리
+                score -= 1 # 둘다 초중종성일 때, 받침 속성이 다를 경우 -1점
+        else: # 서로 문자 구성이 다른 경우(하나는 종성이 있는데 다른 하나는 종성이 없는 경우) +1점
             score += 1
         return score
     
-    # 모음이 완전 일치하지 않는 경우
-    else: 
+    else: # 모음이 일치하지 않는 경우
         det_A = moum_similar_A[moum_similar_A.apply(lambda x: moum[0] in x)].index.values[0]
         det_B = moum_similar_B[moum_similar_B.apply(lambda x: moum[0] in x)].index.values[0]
-#         print(det_B)
+        
         if det_A == moum_similar_A[moum_similar_A.apply(lambda x: moum[1] in x)].index.values[0]:
-            score += 3 # 두 모음이 같은 1등급 유사 모음군에 속할 경우 3점 득점
+            score += 3 # 두 모음이 같은 1등급 유사 모음군에 속할 경우 +3점
+            
             if len(x1)==len(x2): # 두 문자 모두 초중종성 조합이거나 초중성 조합인 경우
-                score += 3 # 일단 3점 줌
+                score += 3 # 우선 +3점
                 if (len(x1)==3 and x1[-1] in ullim_sori and x2[-1] not in ullim_sori) or (len(x1)==3 and x1[-1] not in ullim_sori and x2[-1] in ullim_sori): 
-                    score -= 1 # 둘다 초중종성일 때, 받침 속성이 다르면 1점 감점
+                    score -= 1 # 둘다 초중종성일 때, 받침 속성이 다르면 -1점
+                    
             else: # 서로 문자 구성이 다른 경우
                 score += 1
                 
@@ -109,15 +127,21 @@ def score_element(x1, x2):
             if len(x1)==len(x2): # 두 문자 모두 초중종성 조합이거나 초중성 조합인 경우
                 score += 3 # 일단 3점 줌
                 if (len(x1)==3 and x1[-1] in ullim_sori and x2[-1] not in ullim_sori) or (len(x1)==3 and x1[-1] not in ullim_sori and x2[-1] in ullim_sori): 
-                    score -= 1 # 둘다 초중종성일 때, 받침 속성이 다르면 1점 감점
+                    score -= 1 # 둘다 초중종성일 때, 받침 속성이 다르면 -1점
                 score = score * 0.7
-            else: # 서로 문자 구성이 다른 경우
+            else: # 서로 문자 구성이 다른 경우 +1점
                 score += 1
                 score = score * 0.7
     return score
 
 
 def sori(text):
+    '''
+    입력받은 한국어 텍스트를 소리나는 대로 읽는 함수
+    * 한국어 음운규칙을 따른다
+    * 운율 점수를 구할 수 있는 형태로 리턴
+        * (예) 다운돼있어 -> 다운돼이써 -> ㄷㅏㅇㅜㄴㄷㅙㅇㅣㅅㅅㅓ
+    '''
     text_list = np.array(list(text))
     text_list = text_list[np.where(text_list!=' ')]
     decompose = pd.Series(text_list).apply(lambda x: j2hcj(h2j(x))).tolist()
@@ -129,6 +153,7 @@ def sori(text):
     for idx, word in enumerate(decompose):
         if len(word)==3 and word[-1] in convert_end_sound.keys():
             decompose[idx] = word[:-1] + convert_end_sound[word[-1]]
+            
     for again in range(10):
         for idx in range(len(decompose)-1):
             f_idx = idx
