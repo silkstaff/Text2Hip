@@ -4,5 +4,5 @@ jamo==0.4.1
 konlpy==0.5.2
 nltk==3.4.5
 pandas==0.25.3
-torch==1.4.0+cpu
+torch==2.2.0
 torchtext==0.6.0
